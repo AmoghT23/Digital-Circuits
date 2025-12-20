@@ -1,3 +1,4 @@
+//--------------------------- Design ---------------------------//
 module fullAdder(input logic a, b, cin,
                  output logic s, cout);
   
@@ -8,6 +9,7 @@ endmodule
 
 
 
+//--------------------------- Testbench ---------------------------//
 module fullAdder_tb;
   
   logic a, b, cin;
