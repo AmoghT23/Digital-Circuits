@@ -23,22 +23,14 @@ module wallMultiply(input logic [WIDTH-1:0]a, b,
   wire s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12;
   wire c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12;
   
-  and(w[0], a[0], b[0]);
-  and(w[1], a[0], b[1]);
-  and(w[2], a[0], b[2]);
-  and(w[3], a[0], b[3]);
-  and(w[4], a[1], b[0]);
-  and(w[5], a[1], b[1]);
-  and(w[6], a[1], b[2]);
-  and(w[7], a[1], b[3]);
-  and(w[8], a[2], b[0]);
-  and(w[9], a[2], b[1]);
-  and(w[10], a[2], b[2]);
-  and(w[11], a[2], b[3]);
-  and(w[12], a[3], b[0]);
-  and(w[13], a[3], b[1]);
-  and(w[14], a[3], b[2]);
-  and(w[15], a[3], b[3]);
+      genvar i, j;
+    generate
+        for (i = 0; i < WIDTH; i = i + 1) begin
+            for (j = 0; j < WIDTH; j = j + 1) begin
+                assign w[i*WIDTH + j] = a[i] & b[j];
+            end
+        end
+    endgenerate
   
   halfAdd HA1 (.a(w[9]),  .b(w[12]),  .s(s1), .c(c1));
   halfAdd HA2 (.a(w[10]), .b(w[13]),  .s(s2), .c(c2));
