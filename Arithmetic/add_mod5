@@ -1,0 +1,54 @@
+//--------------------------- Design ---------------------------//
+
+module halfAdder(input logic a, b, 
+                 output logic carry, sum);
+	assign sum = a ^ b;
+	assign carry = a & b;
+endmodule 
+
+module fullAdder(input logic a, b, cin,
+                 output logic cout, sum);
+  assign sum = a^b^cin;
+  assign cout = (a&b) | (b&cin) | (cin&a);
+endmodule 
+
+module pento(input logic [2:0] a,b,
+             output logic [2:0] sum,
+             output logic cout);
+  
+  wire c1, c2, c3;
+  wire [3:0] temp, adjusted;
+  
+  halfAdder ha(.a(a[0]), .b(b[0]), .sum(temp[0]), .carry(c1));
+  fullAdder fa1(.a(a[1]), .b(b[1]), .cin(c1), .sum(temp[1]), .cout(c2));
+  fullAdder fa2(.a(a[2]), .b(b[2]), .cin(c2), .sum(temp[2]), .cout(c3));
+  
+  assign temp[3] = c3;
+  
+  assign cout = temp[3] | (temp[2] & (temp[1] | temp[0]));
+  
+  assign adjusted = temp - 4'd5;
+  
+  assign sum = cout ? adjusted[2:0] : temp[2:0];
+endmodule 
+
+//--------------------------- TestBench ---------------------------//
+
+module pento_tb;
+  
+  logic [2:0]a, b;
+  logic [2:0] sum;
+  reg cout;
+  
+  pento dut(.*);
+  
+  initial begin
+    
+    repeat (100) begin
+      a = $urandom;
+      b = $urandom;
+      #1;
+      $display("a=%0d b=%0d | cout=%0d sum=%0d", a, b, cout, sum);
+    end 
+  end
+endmodule 
