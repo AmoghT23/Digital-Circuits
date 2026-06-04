@@ -30,42 +30,37 @@ module JohnsonCount_tb #(parameter N = 16);
   JohnsonCount #(.N(N)) jC1 (.*);
   
   always #5 clk = ~clk;
+  assert property (@(posedge clk) disable iff (!rst_n) valid)
+else begin
+  $error("[%0t] !! VIOLATION !! Illegal state detected for mode %b: count_out = %0d", $time, mode, count_out);
+end
   
   initial begin
+    clk = 0; rst_n = 0; en = 0; mode = 0;
+    #15;
+    rst_n = 1;
+    
+    #5;
     $display ("[%0t] Staring the Testbench for the Johnson Counter", $time);
     
     $dumpfile("JohnsonCount.vcd");
     $dumpvars(1);
     
-    assign clk = 0;
-    assign rst_n = 0;
-    assign en = 0;
-    assign mode = 0;
-    $display ("[%0t] clk = %0b, rst_n = %0b, en = %0b, mode = %0b | count_out = %0b", $time, clk, rst_n, en, mode, count_out); 
-    
-    if(mode) 
+    repeat (20) begin
+      @(posedge clk);
+      #1;
+    rst_n = $urandom;
+    mode = $urandom;
+	en = $urandom;
+      
+      @(posedge clk);
+     if(mode) 
       $display("Johnson Counter");
     else
       $display("Ring Counter");
     
-    #5;
-    
-    assert property (@(posedge clk) rst_n);
-      #5;
-    $display ("[%0t] rst_n = %0b, en = %0b, mode = %0b | count_out = %0b", $time, rst_n, en, mode, count_out); 
-    
-    #5;
-    
-    
-    assign en = 1;
-    assign mode = 1;
-    $display ("[%0t] rst_n = %0b, en = %0b, mode = %0b | count_out = %0b", $time, rst_n, en, mode, count_out); 
-    
-    if(mode) 
-      $display("Johnson Counter");
-    else
-      $display("Ring Counter"); 
-  end
-  
+    $display ("[%0t] clk = %0b, rst_n = %0b, en = %0b, mode = %0b | count_out = %0d", $time, clk, rst_n, en, mode, count_out); 
+    end
+    $finish;
+    end
 endmodule 
-    
