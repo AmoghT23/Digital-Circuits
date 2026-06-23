@@ -1,16 +1,16 @@
 //Design 
 module LFSR(
   input logic clk, rstn, 
-  output logic [3:0] q);
+  output logic [7:0] q);
   
   logic feedback;
-  assign feedback = q[3] ^ q[0];
+  assign feedback = q[7] ^ q[0];
   
   always_ff @(posedge clk or negedge rstn) begin
     if(!rstn) 
-      q <= 4'b0001;
+      q <= 8'b00000001;
     else
-      q <= {q[2:0], feedback};
+      q <= {q[6:0], feedback};
   end
 endmodule 
 
@@ -18,7 +18,7 @@ endmodule
 module LFSR_tb;
   
   logic clk, rstn;
-  logic [3:0] q;
+  logic [7:0] q;
   
   LFSR dut (.*);
   
@@ -34,13 +34,12 @@ module LFSR_tb;
     repeat(20) begin
       @ (posedge clk); 
       
-      $display("[%0t] q=%b", $time, q);
+      $display("[%0t] q=%08b", $time, q);
       
       assert property (
         @(posedge clk) 
         disable iff(!rstn)
-        q != 4'b0000;
-      $display("[%0t] q=%b", $time, q);
+        q != 8'b00000000
       );
     end
     $finish;
