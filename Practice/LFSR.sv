@@ -48,50 +48,66 @@ endmodule
 //Testbench
 module LFSR_tb;
   
-  logic clk, rstn;
+  logic clk, rst;
   logic mode;
   logic [7:0] q;
   
-  LFSR dut (.*);
+  LFSR dut(.*);
   
-  always #5 clk = ~clk;
+  initial begin 
+    forever #5 clk = ~clk;
+  end
   
   initial begin
-    clk=0;
-    rstn=0;
+    $dumpfile("LFSR.vcd");
+    $dumpvars(1);
     
-    #12;
-    rstn=1;
-    #5;
-    mode = 0;
-    repeat(20) begin
-      @ (posedge clk); 
+    clk = 0;
+    rst = 1;
+    mode = 1;
+    
+    #15;
+    rst = 0;
+    
+    repeat (20) begin
+      	@(posedge clk);
+      #1;
       
-      $display("[%0t] q=%08b", $time, q);
+      if(mode) 
+        $display("[%0t] Fibonnaci LFSR q=%08b", $time, q);
+      else 
+        $display("[%0t] Galois LFSR q=%08b", $time, q);
       
       assert property (
         @(posedge clk) 
-        disable iff(!rstn)
+        disable iff(!rst)
         q != 8'b00000000
       );
+        
     end
         
         #10;
-        mode = 1;
-        repeat(20) begin
-      @ (posedge clk); 
-      
-      $display("[%0t] q=%08b", $time, q);
+        mode = 0;
+        #1;
+        repeat (20) begin
+      	@(posedge clk);
+      #1;
+      if(mode) 
+        $display("[%0t] Fibonnaci LFSR q=%08b", $time, q);
+      else 
+        $display("[%0t] Galois LFSR q=%08b", $time, q);
       
       assert property (
         @(posedge clk) 
-        disable iff(!rstn)
+        disable iff(!rst)
         q != 8'b00000000
       );
-    end
         
-    $finish;
+    end
+                        $finish();
   end
+endmodule 
+    
 endmodule 
         
         
