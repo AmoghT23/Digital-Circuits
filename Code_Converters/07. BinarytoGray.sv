@@ -1,42 +1,38 @@
 //--------------------------- Design ---------------------------//
-module binaryGray #(parameter WIDTH = 4)(
-  input  logic [WIDTH:0] A,
-  output logic [WIDTH:0] G
-);
-
-  genvar i;
-
-  assign G[WIDTH] = A[WIDTH];
-
-  generate
-    for (i = 0; i < WIDTH; i++) begin
-      assign G[i] = A[i+1] ^ A[i];
+module binaryToGray #(parameter N=4)
+  (input logic [(N-1):0] binaryIn,
+   output logic [(N-1):0] grayOut
+  );
+  
+  reg [(N-2):0] temp;
+  
+    always_comb begin
+      for(int n=0; n<=N-2; n++) begin
+        temp[n] <= binaryIn[n+1] ^ binaryIn[n];
+      end
     end
-  endgenerate
-
-endmodule
-
+  
+  assign grayOut = {binaryIn[N-1], temp};
+endmodule 
 
 //--------------------------- TestBench ---------------------------//
-
-module binaryGray_tb #(parameter WIDTH = 4);
-
-  logic [WIDTH-1:0] A;
-  logic [WIDTH-1:0] G;
-
-  // DUT instantiation
-  binaryGray #(WIDTH-1) dut (
-    .A(A),
-    .G(G)
-  );
-
+module binaryToGray_tb;
+  
+  parameter N = 4;
+  logic [N-1:0] grayOut;
+  logic [N-1:0] binaryIn;
+  
+  binaryToGray dut(.*);
+  
   initial begin
-    for (int i = 0; i < (1 << WIDTH); i++) begin
-      A = i;
-      #1;
-      $display("A = %b | G = %b", A, G);
+    
+    for(int i=0; i<=(1<<N); i++) begin
+      {binaryIn} = i;
+      
+      #5;
+      $display("[%0t] Binary code is %0b and Gray code is %0b", $time, binaryIn, grayOut);
+      #5;
     end
     $finish;
   end
-
-endmodule
+endmodule 
